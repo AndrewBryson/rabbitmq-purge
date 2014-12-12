@@ -1,0 +1,16 @@
+{
+  "name": "queue-purge",
+  "version": "1.0.0",
+  "description": "",
+  "main": "purge.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "JSONStream": "^0.10.0",
+    "event-stream": "^3.1.7",
+    "request": "^2.51.0"
+  }
+}
