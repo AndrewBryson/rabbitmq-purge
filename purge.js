@@ -3,18 +3,21 @@ var request = require('request'),
 	JSONStream = require('JSONStream'),
 	es = require('event-stream');
 
-process.env.NO_PROXY = '*';
-var queueSpec = 'http://localhost:15672/api/queues';
-var purgeQueueSpec = format("%s/%2F/%s", queueSpec);
+var vhostName = ''; // e.g. 'dev'
+var connectionString = format("http://localhost:15672/api/queues/%s", vhostName);
+var purgeQueueSpecification = format("%s/%s", connectionString);
 
 var auth = {
 	'user' : 'guest',
 	'pass' : 'guest'
 };
 
+// Prevent 'request' from trying to use a proxy, go direct on the URL instead.
+process.env.NO_PROXY = '*';
+
 // Get a list of queues from the server.
 request
-	.get(queueSpec)
+	.get(connectionString)
 	.auth(auth.user, auth.pass)
 	.pipe(JSONStream.parse('*'))
 	.pipe(es.mapSync(function (data) {
@@ -23,15 +26,15 @@ request
 	}));
 
 // Handles purging of the queue
-function purgeQueue(queue) {
-	var url = format(purgeQueueSpec, queue);
+function purgeQueue(queueNameToPurge) {
+	var url = format(purgeQueueSpecification, queueNameToPurge);
 	console.log('request to: ' + url);
 	
 	request
 		.del(url)
 		.auth(auth.user, auth.pass)
 		.on('error', function(err) { 
-			console.log('error: ' + err); 
+			console.error('error: ' + err); 
 		})
 		.pipe(process.stdout);
 }
